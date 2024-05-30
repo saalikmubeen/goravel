@@ -43,13 +43,25 @@ func handleAuth() error {
 		exitGracefully(err)
 	}
 
-	err = copyFilefromTemplate("templates/models/models.go.txt", gor.RootPath+"/models/models.go")
+	// err = copyFilefromTemplate("templates/models/models.go.txt", gor.RootPath+"/models/models.go")
+	// if err != nil {
+	// 	exitGracefully(err)
+	// }
+
+	// Copy the auth middlewares
+	err = copyFilefromTemplate("templates/middleware/auth.go.txt", gor.RootPath+"/middlware/auth.go")
+	if err != nil {
+		exitGracefully(err)
+	}
+
+	err = copyFilefromTemplate("templates/middleware/middleware.go.txt", gor.RootPath+"/middleware/middleware.go")
 	if err != nil {
 		exitGracefully(err)
 	}
 
 	color.Green("✓ Successfully created and executed the migrations for users, tokens, and remember_tokens.")
 	color.Green("✓ Successfully generated user and token models.")
+	color.Green("✓ Successfully created authentication middleware.")
 	color.Yellow("")
 	color.Cyan("Note: Ensure that the user and token models are registered in models/models.go.")
 	color.Cyan(`      - Register you custom models in modes/modesl.go for initialization and usage`)
