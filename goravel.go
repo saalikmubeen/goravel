@@ -34,6 +34,7 @@ type Goravel struct {
 	DB       Database
 
 	// not exported, used internally
+	// contains mostly loaded environment variables.
 	config config
 }
 
@@ -70,7 +71,7 @@ func (g *Goravel) checkDotEnv(path string) error {
 	return nil
 }
 
-func (g *Goravel) createLoggers() (*log.Logger, *log.Logger) {
+func (g *Goravel) CreateLoggers() (*log.Logger, *log.Logger) {
 	var infoLog *log.Logger
 	var errorLog *log.Logger
 
@@ -92,7 +93,7 @@ func (g *Goravel) createRenderer() {
 	g.Render = &myRenderer
 }
 
-func (g *Goravel) buildDSN() string {
+func (g *Goravel) BuildDSN() string {
 
 	var dsn string = ""
 	dbType := os.Getenv("DATABASE_TYPE")
@@ -119,7 +120,7 @@ func (g *Goravel) New(rootPath string) error {
 
 	paths := initPaths{
 		rootPath:    rootPath,
-		folderNames: []string{"handlers", "migrations", "views", "mail", "data", "public", "tmp", "logs", "middleware", "screenshots"},
+		folderNames: []string{"handlers", "migrations", "views", "mail", "models", "public", "tmp", "logs", "middleware", "screenshots"},
 	}
 
 	// ** create the necessary folders
@@ -142,7 +143,7 @@ func (g *Goravel) New(rootPath string) error {
 	}
 
 	// ** create the loggers
-	infoLog, errorLog := g.createLoggers()
+	infoLog, errorLog := g.CreateLoggers()
 	g.InfoLog = infoLog
 	g.ErrorLog = errorLog
 
@@ -161,7 +162,7 @@ func (g *Goravel) New(rootPath string) error {
 			domain:   os.Getenv("COOKIE_DOMAIN"),
 		},
 		database: databaseConfig{
-			dsn:          g.buildDSN(),
+			dsn:          g.BuildDSN(),
 			databaseType: os.Getenv("DATABASE_TYPE"),
 		},
 	}
@@ -194,7 +195,7 @@ func (g *Goravel) New(rootPath string) error {
 	// ** connect to the database
 	dbType := os.Getenv("DATABASE_TYPE")
 	if dbType != "" {
-		dsn := g.buildDSN()
+		dsn := g.BuildDSN()
 
 		db, err := g.ConnectToDatabase(dbType, dsn)
 

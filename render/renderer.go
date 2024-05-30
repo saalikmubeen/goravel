@@ -35,6 +35,23 @@ type TemplateData struct {
 	Flash           string
 }
 
+func (r *Render) defaultData(td *TemplateData, req *http.Request) *TemplateData {
+	if td == nil {
+		td = &TemplateData{}
+	}
+
+	if r.Session.Exists(req.Context(), "userID") {
+		td.IsAuthenticated = true
+	}
+
+	// td.CSRFToken = r.Session.Get(req.Context(), "csrf_token")
+	td.Port = r.Port
+	td.ServerName = r.ServerName
+	td.Secure = r.Secure
+
+	return td
+}
+
 // Page Function will render a page
 func (r *Render) Page(w http.ResponseWriter, req *http.Request, view string, variables, data interface{}) error {
 	// view is the name of the view (or template) that we want to render
@@ -69,6 +86,9 @@ func (r *Render) GoPage(w http.ResponseWriter, req *http.Request, view string, d
 		}
 	}
 
+	// add the default data to the template data
+	td = r.defaultData(td, req)
+
 	err = tmpl.Execute(w, td)
 	if err != nil {
 		return err
@@ -91,6 +111,9 @@ func (r *Render) JetPage(w http.ResponseWriter, req *http.Request, templateName 
 	if data != nil {
 		td = data.(*TemplateData)
 	}
+
+	// add the default data to the template data
+	td = r.defaultData(td, req)
 
 	t, err := r.JetViews.GetTemplate(fmt.Sprintf("%s.jet", templateName))
 	if err != nil {
