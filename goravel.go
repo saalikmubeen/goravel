@@ -167,17 +167,6 @@ func (g *Goravel) New(rootPath string) error {
 		},
 	}
 
-	// ** Create and initialize the session
-	session := session.Session{
-		CookieLifetime: g.config.cookie.lifetime,
-		CookiePersist:  g.config.cookie.persist,
-		CookieName:     g.config.cookie.name,
-		CookieDomain:   g.config.cookie.domain,
-		CookieSecure:   g.config.cookie.secure,
-		SessionType:    g.config.sessionType,
-	}
-	g.Session = session.InitSession()
-
 	// ** Initialize and create the Jet views
 	var views = jet.NewSet(
 		jet.NewOSFileSystemLoader(fmt.Sprintf("%s/views", rootPath)),
@@ -209,6 +198,18 @@ func (g *Goravel) New(rootPath string) error {
 			Pool:         db,
 		}
 	}
+
+	// ** Create and initialize the session
+	session := session.Session{
+		CookieLifetime: g.config.cookie.lifetime,
+		CookiePersist:  g.config.cookie.persist,
+		CookieName:     g.config.cookie.name,
+		CookieDomain:   g.config.cookie.domain,
+		CookieSecure:   g.config.cookie.secure,
+		SessionType:    g.config.sessionType,
+		DBPool:         g.DB.Pool,
+	}
+	g.Session = session.InitSession()
 
 	return nil
 

@@ -13,8 +13,8 @@ func handleAuth() error {
 	fileName := fmt.Sprintf("%d_create_auth_tables", time.Now().UnixMicro())
 
 	// to files:
-	upFile := gor.RootPath + "/migrations/" + fileName + ".up.sql"
-	downFile := gor.RootPath + "/migrations/" + fileName + ".down.sql"
+	upFile := gor.RootPath + "/migrations/" + fileName + "." + dbType + ".up.sql"
+	downFile := gor.RootPath + "/migrations/" + fileName + "." + dbType + ".down.sql"
 
 	err := copyFilefromTemplate("templates/migrations/auth_tables."+dbType+".up.sql", upFile)
 	if err != nil {

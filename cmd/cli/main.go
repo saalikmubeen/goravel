@@ -87,8 +87,16 @@ func initGoravel() error {
 	gor.Version = version
 	gor.RootPath = rootPath
 
+	var databaseType = ""
+
+	if os.Getenv("DATABASE_TYPE") == "postgres" || os.Getenv("DATABASE_TYPE") == "postgresql" {
+		databaseType = "postgres"
+	} else {
+		databaseType = os.Getenv("DATABASE_TYPE")
+	}
+
 	gor.DB = goravel.Database{
-		DatabaseType: os.Getenv("DATABASE_TYPE"),
+		DatabaseType: databaseType,
 	}
 
 	return nil

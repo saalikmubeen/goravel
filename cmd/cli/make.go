@@ -14,6 +14,12 @@ func handleMake(arg2 string, arg3 string) error {
 		if err != nil {
 			exitGracefully(err)
 		}
+
+	case "session":
+		err := handleSession()
+		if err != nil {
+			exitGracefully(err)
+		}
 	}
 
 	return nil
