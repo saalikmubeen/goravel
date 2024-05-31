@@ -16,6 +16,7 @@ require (
 	github.com/alexedwards/scs/v2 v2.8.0 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
 	github.com/fatih/color v1.17.0 // indirect
+	github.com/gertd/go-pluralize v0.2.1 // indirect
 	github.com/go-sql-driver/mysql v1.8.1 // indirect
 	github.com/golang-migrate/migrate/v4 v4.17.1 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
