@@ -167,20 +167,6 @@ func (g *Goravel) New(rootPath string) error {
 		},
 	}
 
-	// ** Initialize and create the Jet views
-	var views = jet.NewSet(
-		jet.NewOSFileSystemLoader(fmt.Sprintf("%s/views", rootPath)),
-		jet.InDevelopmentMode(),
-	)
-
-	g.JetViews = views
-
-	// ** create the renderer that renders our templates
-	g.createRenderer()
-
-	//**  create the routes
-	g.Routes = g.initRoutes().(*chi.Mux)
-
 	// ** connect to the database
 	dbType := os.Getenv("DATABASE_TYPE")
 	if dbType != "" {
@@ -210,6 +196,24 @@ func (g *Goravel) New(rootPath string) error {
 		DBPool:         g.DB.Pool,
 	}
 	g.Session = session.InitSession()
+
+	//**  create the routes
+	// Routes have to be created after the session has been initialized
+	// because the session is used in the routes
+	g.Routes = g.initRoutes().(*chi.Mux)
+
+	// ** Initialize and create the Jet views
+	var views = jet.NewSet(
+		jet.NewOSFileSystemLoader(fmt.Sprintf("%s/views", rootPath)),
+		jet.InDevelopmentMode(),
+	)
+
+	g.JetViews = views
+
+	// ** create the renderer that renders our templates
+	// The renderer has to be created after the Jet views and session is initialized
+	// because the renderer uses the Jet views and session
+	g.createRenderer()
 
 	return nil
 

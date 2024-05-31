@@ -20,6 +20,12 @@ func handleMake(arg2 string, arg3 string) error {
 		if err != nil {
 			exitGracefully(err)
 		}
+
+	case "handler":
+		err := handleHandler(arg3)
+		if err != nil {
+			exitGracefully(err)
+		}
 	}
 
 	return nil
