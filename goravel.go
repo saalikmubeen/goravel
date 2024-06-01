@@ -11,7 +11,9 @@ import (
 	"github.com/CloudyKit/jet/v6"
 	"github.com/alexedwards/scs/v2"
 	"github.com/go-chi/chi/v5"
+	"github.com/gomodule/redigo/redis"
 	"github.com/joho/godotenv"
+	"github.com/saalikmubeen/goravel/cache"
 	"github.com/saalikmubeen/goravel/render"
 	"github.com/saalikmubeen/goravel/session"
 )
@@ -19,6 +21,9 @@ import (
 const (
 	version = "1.0.0"
 )
+
+var myRedisCache *cache.RedisCache
+var redisPool *redis.Pool
 
 type Goravel struct {
 	AppName  string
@@ -32,6 +37,7 @@ type Goravel struct {
 	JetViews *jet.Set
 	Session  *scs.SessionManager
 	DB       Database
+	Cache    cache.Cache
 
 	// not exported, used internally
 	// contains mostly loaded environment variables.
@@ -44,8 +50,7 @@ type config struct {
 	cookie      cookieConfig
 	sessionType string
 	database    databaseConfig
-	// redis       redisConfig
-	// uploads     uploadConfig
+	redis       redisConfig
 }
 
 // CreateFolderStructure creates necessary folders for our Goravel application
@@ -116,6 +121,32 @@ func (g *Goravel) BuildDSN() string {
 	return dsn
 }
 
+func (g *Goravel) createRedisCache() *cache.RedisCache {
+	cacheClient := cache.RedisCache{
+		Conn:   g.createRedisPool(),
+		Prefix: g.config.redis.prefix,
+	}
+	return &cacheClient
+}
+
+func (g *Goravel) createRedisPool() *redis.Pool {
+	return &redis.Pool{
+		MaxIdle:     50,
+		MaxActive:   10000,
+		IdleTimeout: 240 * time.Second,
+		Dial: func() (redis.Conn, error) {
+			return redis.Dial("tcp",
+				g.config.redis.host,
+				redis.DialPassword(g.config.redis.password))
+		},
+
+		TestOnBorrow: func(conn redis.Conn, t time.Time) error {
+			_, err := conn.Do("PING")
+			return err
+		},
+	}
+}
+
 func (g *Goravel) New(rootPath string) error {
 
 	paths := initPaths{
@@ -165,6 +196,12 @@ func (g *Goravel) New(rootPath string) error {
 			dsn:          g.BuildDSN(),
 			databaseType: os.Getenv("DATABASE_TYPE"),
 		},
+		sessionType: os.Getenv("SESSION_TYPE"),
+		redis: redisConfig{
+			host:     os.Getenv("REDIS_HOST"),
+			password: os.Getenv("REDIS_PASSWORD"),
+			prefix:   os.Getenv("REDIS_PREFIX"),
+		},
 	}
 
 	// ** connect to the database
@@ -185,6 +222,13 @@ func (g *Goravel) New(rootPath string) error {
 		}
 	}
 
+	// ** Initilize the cache
+	if os.Getenv("CACHE") == "redis" || os.Getenv("SESSION_TYPE") == "redis" {
+		myRedisCache = g.createRedisCache()
+		redisPool = myRedisCache.Conn
+		g.Cache = myRedisCache
+	}
+
 	// ** Create and initialize the session
 	session := session.Session{
 		CookieLifetime: g.config.cookie.lifetime,
@@ -193,8 +237,16 @@ func (g *Goravel) New(rootPath string) error {
 		CookieDomain:   g.config.cookie.domain,
 		CookieSecure:   g.config.cookie.secure,
 		SessionType:    g.config.sessionType,
-		DBPool:         g.DB.Pool,
 	}
+
+	// set the session store
+	switch g.config.sessionType {
+	case "redis":
+		session.RedisPool = myRedisCache.Conn
+	case "mysql", "postgres", "postgresql", "mariadb":
+		session.DBPool = g.DB.Pool
+	}
+
 	g.Session = session.InitSession()
 
 	//**  create the routes
