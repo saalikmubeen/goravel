@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"strconv"
 
@@ -17,18 +16,16 @@ var gor *goravel.Goravel
 
 func main() {
 
-	err := initGoravel()
-	if err != nil {
-		exitGracefully(err)
-	}
-
 	arg1, arg2, arg3, err := readArgs()
-
 	if err != nil {
 		exitGracefully(err)
 	}
 
-	fmt.Println(arg1, arg2, arg3)
+	// ** Initialize Goravel
+	err = initGoravel(arg1)
+	if err != nil {
+		exitGracefully(err)
+	}
 
 	switch arg1 {
 	case "help":
@@ -36,6 +33,17 @@ func main() {
 
 	case "version":
 		color.Green("Version: %s", gor.Version)
+
+	case "new":
+		if arg2 == "" {
+			exitGracefully(errors.New("new requires a project name"), "Usage: goravel new <project_name>")
+		} else {
+			err := createNewGoravelApp(arg2)
+			if err != nil {
+				exitGracefully(err)
+			}
+
+		}
 
 	case "make":
 		if arg2 == "" {
@@ -61,16 +69,22 @@ func main() {
 
 }
 
-func initGoravel() error {
+func initGoravel(arg1 string) error {
 
 	gor = &goravel.Goravel{}
 
 	rootPath, err := os.Getwd()
-
 	if err != nil {
 		return err
-
 	}
+
+	gor.RootPath = rootPath
+	gor.Version = version
+
+	if arg1 == "help" || arg1 == "version" || arg1 == "new" {
+		return nil
+	}
+
 	// Load the .env file into the environment
 	// read .env
 	err = godotenv.Load(rootPath + "/.env")
@@ -84,8 +98,6 @@ func initGoravel() error {
 	gor.ErrorLog = errorLog
 
 	gor.Debug, _ = strconv.ParseBool(os.Getenv("DEBUG"))
-	gor.Version = version
-	gor.RootPath = rootPath
 
 	var databaseType = ""
 

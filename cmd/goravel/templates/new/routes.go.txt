@@ -1,0 +1,22 @@
+package main
+
+import (
+	"net/http"
+
+	"github.com/go-chi/chi/v5"
+)
+
+func (app *application) routes() *chi.Mux {
+
+	// ** Add your middleware here
+
+	// ** Add your routes here
+	app.App.Routes.Get("/", app.Handlers.Home)
+
+	// ** Static file server
+	fileServer := http.FileServer(http.Dir("./public"))
+	app.App.Routes.Handle("/public/*", http.StripPrefix("/public", fileServer))
+
+	return app.App.Routes
+
+}

@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"github.com/saalikmubeen/goravel"
-	"github.com/saalikmubeen/goravel-demo-app/models"
+	"${APP_URL}/models"
 )
 
 type Middleware struct {

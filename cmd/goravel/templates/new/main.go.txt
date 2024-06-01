@@ -1,0 +1,22 @@
+package main
+
+import (
+	"github.com/saalikmubeen/goravel"
+	"${APP_URL}/handlers"
+	"${APP_URL}/middleware"
+	"${APP_URL}/models"
+)
+
+type application struct {
+	App        *goravel.Goravel
+	Handlers   *handlers.Handlers
+	Models     *models.Models
+	Middleware *middleware.Middleware
+}
+
+func main() {
+
+	app := initGoravel()
+	app.App.ListenAndServe()
+
+}

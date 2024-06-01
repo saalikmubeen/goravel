@@ -1,0 +1,22 @@
+package handlers
+
+import (
+	"net/http"
+
+	"github.com/saalikmubeen/goravel"
+	"${APP_URL}/models"
+)
+
+type Handlers struct {
+	App    *goravel.Goravel
+	Models *models.Models
+}
+
+func (h *Handlers) Home(w http.ResponseWriter, r *http.Request) {
+
+	h.App.WriteJSON(w, http.StatusOK, map[string]interface{}{
+		"data":    "Happy coding!",
+		"message": "Welcome to Goravel!",
+	})
+
+}

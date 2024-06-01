@@ -14,11 +14,11 @@ var db *sql.DB
 var upper up.Session
 
 // Models is the wrapper for all database models
+// any models inserted here (and in the New function)
+// are easily accessible throughout the entire application
 type Models struct {
-	// any models inserted here (and in the New function)
-	// are easily accessible throughout the entire application
-	Users  User
-	Tokens Token
+
+	// ** Register your models here.
 }
 
 // New initializes the models package for use
@@ -32,15 +32,15 @@ func New(database goravel.Database) *Models {
 	}
 
 	return &Models{
-		Users:  User{},
-		Tokens: Token{},
+
+		// ** Register your models here.
 	}
 }
 
 // getInsertID returns the integer value of a newly inserted id (using upper)
 func getInsertID(i up.ID) int {
 	idType := fmt.Sprintf("%T", i)
-	if idType == "int64" { // postgres returns int64 for insert id
+	if idType == "int64" { // postgres returns int64 for inserted id
 		return int(i.(int64))
 	}
 

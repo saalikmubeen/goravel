@@ -14,6 +14,7 @@ func handleHandler(arg3 string) error {
 		exitGracefully(errors.New("you must give the handler a name"), "Usage: goravel make handler <handler_name>")
 	}
 
+	// to file
 	fileName := gor.RootPath + "/handlers/" + strings.ToLower(arg3) + ".go"
 
 	if fileExists(fileName) {

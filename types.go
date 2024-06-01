@@ -2,9 +2,9 @@ package goravel
 
 import "database/sql"
 
-type initPaths struct {
-	rootPath    string   // rootPath is the path that we are in when we start the goravel app
-	folderNames []string // folderNames is the names of the folders that we need to create in the rootPath
+type InitPaths struct {
+	RootPath    string   // rootPath is the path that we are in when we start the goravel app
+	FolderNames []string // folderNames is the names of the folders that we need to create in the rootPath
 }
 
 type cookieConfig struct {

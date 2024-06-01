@@ -54,10 +54,10 @@ type config struct {
 }
 
 // CreateFolderStructure creates necessary folders for our Goravel application
-func (g *Goravel) CreateFolderStructure(p initPaths) error {
-	rootPath := p.rootPath // string that holds the full pathname to the root level of my web app
+func (g *Goravel) CreateFolderStructure(p InitPaths) error {
+	rootPath := p.RootPath // string that holds the full pathname to the root level of my web app
 
-	for _, folderName := range p.folderNames {
+	for _, folderName := range p.FolderNames {
 		// create a folder in the rootPath if it doesn't exist
 		err := g.CreateDirIfNotExists(fmt.Sprintf("%s/%s", rootPath, folderName))
 
@@ -149,9 +149,9 @@ func (g *Goravel) createRedisPool() *redis.Pool {
 
 func (g *Goravel) New(rootPath string) error {
 
-	paths := initPaths{
-		rootPath:    rootPath,
-		folderNames: []string{"handlers", "migrations", "views", "mail", "models", "public", "tmp", "logs", "middleware", "screenshots"},
+	paths := InitPaths{
+		RootPath:    rootPath,
+		FolderNames: []string{"handlers", "migrations", "views", "mail", "models", "public", "tmp", "logs", "middleware", "screenshots"},
 	}
 
 	// ** create the necessary folders
