@@ -132,6 +132,13 @@ func createNewGoravelApp(arg2 string) error {
 		return err
 	}
 
+	// Copy .gitignore file
+	toFile = gor.RootPath + "/" + ".gitignore"
+	err = handleCopyDataToFile("templates/new/gitignore.txt", toFile, replaceDataMap{})
+	if err != nil {
+		return err
+	}
+
 	color.Green("✓ Successfully created new Goravel project: %s", arg2)
 	color.Yellow("")
 

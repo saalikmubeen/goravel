@@ -43,18 +43,8 @@ func handleAuth() error {
 		exitGracefully(err)
 	}
 
-	// err = copyFilefromTemplate("templates/models/models.go.txt", gor.RootPath+"/models/models.go")
-	// if err != nil {
-	// 	exitGracefully(err)
-	// }
-
 	// Copy the auth middlewares
-	err = copyFilefromTemplate("templates/middleware/auth.go.txt", gor.RootPath+"/middlware/auth.go")
-	if err != nil {
-		exitGracefully(err)
-	}
-
-	err = copyFilefromTemplate("templates/middleware/middleware.go.txt", gor.RootPath+"/middleware/middleware.go")
+	err = copyFilefromTemplate("templates/middleware/auth.go.txt", gor.RootPath+"/middleware/auth.go")
 	if err != nil {
 		exitGracefully(err)
 	}
