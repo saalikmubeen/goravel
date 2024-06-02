@@ -32,6 +32,12 @@ func handleMake(arg2 string, arg3 string) error {
 		if err != nil {
 			exitGracefully(err)
 		}
+
+	case "mail":
+		err := handleMail(arg3)
+		if err != nil {
+			exitGracefully(err)
+		}
 	}
 
 	return nil

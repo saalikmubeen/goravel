@@ -14,12 +14,13 @@ import (
 	"github.com/gomodule/redigo/redis"
 	"github.com/joho/godotenv"
 	"github.com/saalikmubeen/goravel/cache"
+	"github.com/saalikmubeen/goravel/mailer"
 	"github.com/saalikmubeen/goravel/render"
 	"github.com/saalikmubeen/goravel/session"
 )
 
 const (
-	version = "1.1.0"
+	version = "1.2.0"
 )
 
 var myRedisCache *cache.RedisCache
@@ -39,6 +40,7 @@ type Goravel struct {
 	DB            Database
 	Cache         cache.Cache
 	EncryptionKey string
+	Mail          mailer.Mail
 
 	// not exported, used internally
 	// contains mostly loaded environment variables.
@@ -148,6 +150,27 @@ func (g *Goravel) createRedisPool() *redis.Pool {
 	}
 }
 
+func (g *Goravel) createMailer() mailer.Mail {
+	port, _ := strconv.Atoi(os.Getenv("SMTP_PORT"))
+	m := mailer.Mail{
+		Domain:      os.Getenv("MAIL_DOMAIN"),
+		Templates:   g.RootPath + "/mail",
+		Host:        os.Getenv("SMTP_HOST"),
+		Port:        port,
+		Username:    os.Getenv("SMTP_USERNAME"),
+		Password:    os.Getenv("SMTP_PASSWORD"),
+		Encryption:  os.Getenv("SMTP_ENCRYPTION"),
+		FromName:    os.Getenv("FROM_NAME"),
+		FromAddress: os.Getenv("FROM_ADDRESS"),
+		Jobs:        make(chan mailer.Message, 20),
+		Results:     make(chan mailer.Result, 20),
+		API:         os.Getenv("MAILER_API"),
+		APIKey:      os.Getenv("MAILER_KEY"),
+		APIUrl:      os.Getenv("MAILER_URL"),
+	}
+	return m
+}
+
 func (g *Goravel) New(rootPath string) error {
 
 	paths := InitPaths{
@@ -205,6 +228,9 @@ func (g *Goravel) New(rootPath string) error {
 			prefix:   os.Getenv("REDIS_PREFIX"),
 		},
 	}
+
+	// ** create the mailer
+	g.Mail = g.createMailer()
 
 	// ** connect to the database
 	dbType := os.Getenv("DATABASE_TYPE")
@@ -275,6 +301,9 @@ func (g *Goravel) New(rootPath string) error {
 	// The renderer has to be created after the Jet views and session is initialized
 	// because the renderer uses the Jet views and session
 	g.createRenderer()
+
+	// ** Start the mail listener
+	go g.Mail.ListenForMail()
 
 	return nil
 
