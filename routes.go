@@ -24,9 +24,9 @@ func (g *Goravel) initRoutes() http.Handler {
 	// add the CSRF protection
 	mux.Use(g.NoSurf)
 
-	mux.Get("/ping", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Hello World"))
-	})
+	// mux.Get("/ping", func(w http.ResponseWriter, r *http.Request) {
+	// 	w.Write([]byte("Hello World"))
+	// })
 
 	return mux
 

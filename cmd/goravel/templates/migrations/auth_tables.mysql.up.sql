@@ -14,18 +14,18 @@ CREATE TABLE `users` (
     KEY `users_email_index` (`email`)
 ) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4;
 
-drop table if exists remember_tokens cascade;
+drop table if exists remember_me_tokens cascade;
 
-CREATE TABLE `remember_tokens` (
+CREATE TABLE `remember_me_tokens` (
     `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
     `user_id` int(10) unsigned NOT NULL,
-    `remember_token` varchar(100) NOT NULL DEFAULT '',
+    `remember_me_token` varchar(100) NOT NULL DEFAULT '',
     `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
     `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
     PRIMARY KEY (`id`),
-    KEY `remember_token` (`remember_token`),
-    KEY `remember_tokens_user_id_foreign` (`user_id`),
-    CONSTRAINT `remember_tokens_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+    KEY `remember_me_token` (`remember_me_token`),
+    KEY `remember_me_tokens_user_id_foreign` (`user_id`),
+    CONSTRAINT `remember_me_tokens_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8;
 
 drop table if exists tokens cascade;

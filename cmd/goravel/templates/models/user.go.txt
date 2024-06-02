@@ -179,3 +179,16 @@ func (u *User) PasswordMatches(plainText string) (bool, error) {
 
 	return true, nil
 }
+
+
+
+
+// CheckForRememberToken checks for a remember_me_token associated with a user
+func (u *User) CheckForRememberToken(id int, token string) bool {
+	var rememberMeToken RememberMeToken
+	rt := RememberMeToken{}
+	collection := upper.Collection(rt.Table())
+	res := collection.Find(up.Cond{"user_id": id, "remember_me_token": token})
+	err := res.One(&rememberMeToken)
+	return err == nil // return true if no error
+}
