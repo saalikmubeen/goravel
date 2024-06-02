@@ -1,7 +1,11 @@
 package goravel
 
 import (
+	"crypto/aes"
+	"crypto/cipher"
 	"crypto/rand"
+	"encoding/base64"
+	"io"
 	"os"
 )
 
@@ -58,4 +62,52 @@ func (g *Goravel) RandomString(n int) string {
 
 	// Convert the slice of runes s to a string and return it
 	return string(s)
+}
+
+type Encryption struct {
+	Key []byte
+}
+
+// Encrypt encrypts a string using the AES encryption algorithm
+func (e *Encryption) Encrypt(text string) (string, error) {
+	plaintext := []byte(text)
+
+	block, err := aes.NewCipher(e.Key)
+	if err != nil {
+		return "", err
+	}
+
+	ciphertext := make([]byte, aes.BlockSize+len(plaintext))
+	iv := ciphertext[:aes.BlockSize] // Initialization vector
+	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
+		return "", err
+	}
+
+	stream := cipher.NewCFBEncrypter(block, iv)
+	stream.XORKeyStream(ciphertext[aes.BlockSize:], plaintext)
+
+	// Encode the encrypted text to base64
+	return base64.URLEncoding.EncodeToString(ciphertext), nil
+}
+
+// Decrypt decrypts a string using the AES encryption algorithm
+func (e *Encryption) Decrypt(cryptoText string) (string, error) {
+	encetptedText, _ := base64.URLEncoding.DecodeString(cryptoText)
+
+	block, err := aes.NewCipher(e.Key)
+	if err != nil {
+		return "", err
+	}
+
+	if len(encetptedText) < aes.BlockSize {
+		return "", err
+	}
+
+	iv := encetptedText[:aes.BlockSize]
+	ciphertext := encetptedText[aes.BlockSize:]
+
+	stream := cipher.NewCFBDecrypter(block, iv)
+	stream.XORKeyStream(ciphertext, ciphertext)
+
+	return string(ciphertext), nil
 }

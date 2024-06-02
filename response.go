@@ -2,11 +2,14 @@ package goravel
 
 import (
 	"encoding/json"
+	"encoding/xml"
 	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
+	"path"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -14,7 +17,7 @@ import (
 )
 
 // Define an envelope type.
-type envelope map[string]interface{}
+type Envelope map[string]interface{}
 
 // readIDParam reads interpolated "id" from request URL and returns it and nil. If there is an error
 // it returns and 0 and an error.
@@ -32,7 +35,7 @@ func (g *Goravel) ReadIDParam(r *http.Request) (int64, error) {
 
 // writeJSON marshals data structure to encoded JSON response. It returns an error if there are
 // any issues, else error is nil.
-func (g *Goravel) WriteJSON(w http.ResponseWriter, status int, data envelope,
+func (g *Goravel) WriteJSON(w http.ResponseWriter, status int, data Envelope,
 	headers ...http.Header) error {
 	// Use the json.MarshalIndent() function so that whitespace is added to the encoded JSON. Use
 	// no line prefix and tab indents for each element.
@@ -219,4 +222,60 @@ func (g *Goravel) ReadInt(qs url.Values, key string, defaultValue int) (int, err
 
 	// Otherwise, return the converted integer value.
 	return i, nil
+}
+
+// WriteXML sends an XML response
+func (g *Goravel) WriteXML(w http.ResponseWriter, status int, data interface{}, headers ...http.Header) error {
+	out, err := xml.MarshalIndent(data, "", "   ")
+	if err != nil {
+		return err
+	}
+
+	if len(headers) > 0 {
+		for key, value := range headers[0] {
+			w.Header()[key] = value
+		}
+	}
+
+	w.Header().Set("Content-Type", "application/xml")
+	w.WriteHeader(status)
+	_, err = w.Write(out)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// DownloadFile helps users download files from the server
+func (g *Goravel) DownloadFile(w http.ResponseWriter, r *http.Request, pathToFile, fileName string) error {
+	fp := path.Join(pathToFile, fileName)
+	fileToServe := filepath.Clean(fp)
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; file=\"%s\"", fileName))
+	http.ServeFile(w, r, fileToServe)
+	return nil
+}
+
+// Error404 returns page not found response
+func (g *Goravel) Error404(w http.ResponseWriter, r *http.Request) {
+	g.ErrorStatus(w, http.StatusNotFound)
+}
+
+// Error500 returns internal server error response
+func (g *Goravel) Error500(w http.ResponseWriter, r *http.Request) {
+	g.ErrorStatus(w, http.StatusInternalServerError)
+}
+
+// ErrorUnauthorized sends an unauthorized status (client is not known)
+func (g *Goravel) ErrorUnauthorized(w http.ResponseWriter, r *http.Request) {
+	g.ErrorStatus(w, http.StatusUnauthorized)
+}
+
+// ErrorForbidden returns a forbidden status message (client is known)
+func (g *Goravel) ErrorForbidden(w http.ResponseWriter, r *http.Request) {
+	g.ErrorStatus(w, http.StatusForbidden)
+}
+
+// ErrorStatus returns a response with the supplied http status
+func (g *Goravel) ErrorStatus(w http.ResponseWriter, status int) {
+	http.Error(w, http.StatusText(status), status)
 }

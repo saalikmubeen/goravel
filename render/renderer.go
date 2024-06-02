@@ -9,6 +9,7 @@ import (
 
 	"github.com/CloudyKit/jet/v6"
 	"github.com/alexedwards/scs/v2"
+	"github.com/justinas/nosurf"
 )
 
 type Render struct {
@@ -44,7 +45,8 @@ func (r *Render) defaultData(td *TemplateData, req *http.Request) *TemplateData 
 		td.IsAuthenticated = true
 	}
 
-	// td.CSRFToken = r.Session.Get(req.Context(), "csrf_token")
+	td.CSRFToken = nosurf.Token(req) // add the CSRF token to the template data
+
 	td.Port = r.Port
 	td.ServerName = r.ServerName
 	td.Secure = r.Secure

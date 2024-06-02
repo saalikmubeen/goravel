@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"log"
 	"os"
 	"os/exec"
@@ -46,7 +45,7 @@ func createNewGoravelApp(arg2 string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("Root path is", rootPath)
+	// fmt.Println("Root path is", rootPath)
 	gor.RootPath = rootPath
 
 	paths := goravel.InitPaths{
@@ -158,6 +157,8 @@ func createNewGoravelApp(arg2 string) error {
 
 type replaceDataMap map[string]string
 
+// handleCopyDataToFile copies data from a file in the templateFS, replaces the placeholders
+// and writes it to a new file in the rootPath
 func handleCopyDataToFile(from string, to string, replace replaceDataMap) error {
 
 	if fileExists(to) {

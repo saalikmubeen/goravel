@@ -26,18 +26,19 @@ var myRedisCache *cache.RedisCache
 var redisPool *redis.Pool
 
 type Goravel struct {
-	AppName  string
-	Debug    bool // true for development mode
-	Version  string
-	ErrorLog *log.Logger
-	InfoLog  *log.Logger
-	RootPath string // rootPath is the path that we are in when we start the goravel app
-	Render   *render.Render
-	Routes   *chi.Mux
-	JetViews *jet.Set
-	Session  *scs.SessionManager
-	DB       Database
-	Cache    cache.Cache
+	AppName       string
+	Debug         bool // true for development mode
+	Version       string
+	ErrorLog      *log.Logger
+	InfoLog       *log.Logger
+	RootPath      string // rootPath is the path that we are in when we start the goravel app
+	Render        *render.Render
+	Routes        *chi.Mux
+	JetViews      *jet.Set
+	Session       *scs.SessionManager
+	DB            Database
+	Cache         cache.Cache
+	EncryptionKey string
 
 	// not exported, used internally
 	// contains mostly loaded environment variables.
@@ -181,6 +182,7 @@ func (g *Goravel) New(rootPath string) error {
 	g.Debug, _ = strconv.ParseBool(os.Getenv("DEBUG"))
 	g.Version = version
 	g.RootPath = rootPath
+	g.EncryptionKey = os.Getenv("KEY")
 
 	g.config = config{
 		port:     os.Getenv("PORT"),
@@ -255,12 +257,19 @@ func (g *Goravel) New(rootPath string) error {
 	g.Routes = g.initRoutes().(*chi.Mux)
 
 	// ** Initialize and create the Jet views
-	var views = jet.NewSet(
-		jet.NewOSFileSystemLoader(fmt.Sprintf("%s/views", rootPath)),
-		jet.InDevelopmentMode(),
-	)
+	if g.Debug {
+		var views = jet.NewSet(
+			jet.NewOSFileSystemLoader(fmt.Sprintf("%s/views", rootPath)),
+			jet.InDevelopmentMode(),
+		)
 
-	g.JetViews = views
+		g.JetViews = views
+	} else {
+		var views = jet.NewSet(
+			jet.NewOSFileSystemLoader(fmt.Sprintf("%s/views", rootPath)),
+		)
+		g.JetViews = views
+	}
 
 	// ** create the renderer that renders our templates
 	// The renderer has to be created after the Jet views and session is initialized
