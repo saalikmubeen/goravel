@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/CloudyKit/jet/v6"
@@ -28,8 +29,10 @@ var redisPool *redis.Pool
 
 type Goravel struct {
 	AppName       string
+	GoAppURL      string
 	Debug         bool // true for development mode
 	Version       string
+	Server        Server
 	ErrorLog      *log.Logger
 	InfoLog       *log.Logger
 	RootPath      string // rootPath is the path that we are in when we start the goravel app
@@ -202,6 +205,8 @@ func (g *Goravel) New(rootPath string) error {
 	g.InfoLog = infoLog
 	g.ErrorLog = errorLog
 
+	g.AppName = os.Getenv("APP_NAME")
+	g.GoAppURL = os.Getenv("GO_APP_URL")
 	g.Debug, _ = strconv.ParseBool(os.Getenv("DEBUG"))
 	g.Version = version
 	g.RootPath = rootPath
@@ -227,6 +232,19 @@ func (g *Goravel) New(rootPath string) error {
 			password: os.Getenv("REDIS_PASSWORD"),
 			prefix:   os.Getenv("REDIS_PREFIX"),
 		},
+	}
+
+	secure := false
+	if strings.ToLower(os.Getenv("SECURE")) == "true" {
+		secure = true
+	} else {
+		secure = false
+	}
+	g.Server = Server{
+		ServerName: os.Getenv("SERVER_NAME"),
+		Port:       os.Getenv("PORT"),
+		Secure:     secure,
+		URL:        os.Getenv("APP_URL"),
 	}
 
 	// ** create the mailer

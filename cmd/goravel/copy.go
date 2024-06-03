@@ -2,6 +2,7 @@ package main
 
 import (
 	"embed"
+	"errors"
 	"os"
 )
 
@@ -10,6 +11,10 @@ var templateFS embed.FS
 
 func copyFilefromTemplate(from string, to string) error {
 	// from -> templatePath
+
+	if fileExists(to) {
+		return errors.New(to + " already exists!")
+	}
 
 	data, err := templateFS.ReadFile(from)
 

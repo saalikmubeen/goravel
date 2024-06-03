@@ -7,6 +7,13 @@ type InitPaths struct {
 	FolderNames []string // folderNames is the names of the folders that we need to create in the rootPath
 }
 
+type Server struct {
+	ServerName string
+	Port       string
+	Secure     bool
+	URL        string
+}
+
 type cookieConfig struct {
 	name     string
 	lifetime string

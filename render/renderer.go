@@ -33,6 +33,7 @@ type TemplateData struct {
 	Port            string
 	ServerName      string
 	Secure          bool
+	Error           string
 	Flash           string
 }
 
@@ -41,6 +42,7 @@ func (r *Render) defaultData(td *TemplateData, req *http.Request) *TemplateData 
 		td = &TemplateData{}
 	}
 
+	// check if the userId key exists in the session related to the current request/user
 	if r.Session.Exists(req.Context(), "userID") {
 		td.IsAuthenticated = true
 	}
@@ -50,6 +52,11 @@ func (r *Render) defaultData(td *TemplateData, req *http.Request) *TemplateData 
 	td.Port = r.Port
 	td.ServerName = r.ServerName
 	td.Secure = r.Secure
+
+	// get the error and flash messages from the session and add them to the template data
+	// pop deletes the value from the session after it has been retrieved
+	td.Error = r.Session.PopString(req.Context(), "error")
+	td.Flash = r.Session.PopString(req.Context(), "flash")
 
 	return td
 }

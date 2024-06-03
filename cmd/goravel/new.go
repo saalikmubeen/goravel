@@ -62,9 +62,10 @@ func createNewGoravelApp(arg2 string) error {
 	// ** Check if the .env file exists, if not create it
 	// to file
 	toFile := gor.RootPath + "/" + ".env"
-	err = handleCopyDataToFile("templates/new/env.txt", toFile, replaceDataMap{
-		"${APP_NAME}": appName,
-		"${KEY}":      gor.RandomString(32),
+	err = handleCopyDataToFile("templates/new/env.txt", toFile, ReplaceDataMap{
+		"${APP_NAME}":   appName,
+		"${GO_APP_URL}": appURL,
+		"${KEY}":        gor.RandomString(32),
 	})
 	if err != nil {
 		return err
@@ -72,7 +73,7 @@ func createNewGoravelApp(arg2 string) error {
 
 	// Copy main.go file
 	toFile = gor.RootPath + "/" + "main.go"
-	err = handleCopyDataToFile("templates/new/main.go.txt", toFile, replaceDataMap{
+	err = handleCopyDataToFile("templates/new/main.go.txt", toFile, ReplaceDataMap{
 		"${APP_URL}": appURL,
 	})
 	if err != nil {
@@ -81,14 +82,14 @@ func createNewGoravelApp(arg2 string) error {
 
 	// Copy routes.go file
 	toFile = gor.RootPath + "/" + "routes.go"
-	err = handleCopyDataToFile("templates/new/routes.go.txt", toFile, replaceDataMap{})
+	err = handleCopyDataToFile("templates/new/routes.go.txt", toFile, ReplaceDataMap{})
 	if err != nil {
 		return err
 	}
 
 	// Copy init-goravel.go file
 	toFile = gor.RootPath + "/" + "init-goravel.go"
-	err = handleCopyDataToFile("templates/new/init-goravel.go.txt", toFile, replaceDataMap{
+	err = handleCopyDataToFile("templates/new/init-goravel.go.txt", toFile, ReplaceDataMap{
 		"${APP_URL}": appURL,
 	})
 	if err != nil {
@@ -97,7 +98,7 @@ func createNewGoravelApp(arg2 string) error {
 
 	// Copy middlewares.go file
 	toFile = gor.RootPath + "/middleware" + "/" + "middleware.go"
-	err = handleCopyDataToFile("templates/middleware/middleware.go.txt", toFile, replaceDataMap{
+	err = handleCopyDataToFile("templates/middleware/middleware.go.txt", toFile, ReplaceDataMap{
 		"${APP_URL}": appURL,
 	})
 	if err != nil {
@@ -106,7 +107,7 @@ func createNewGoravelApp(arg2 string) error {
 
 	// Copy models.go file
 	toFile = gor.RootPath + "/models" + "/" + "models.go"
-	err = handleCopyDataToFile("templates/models/models.go.txt", toFile, replaceDataMap{
+	err = handleCopyDataToFile("templates/models/models.go.txt", toFile, ReplaceDataMap{
 		"${APP_URL}": appURL,
 	})
 	if err != nil {
@@ -115,16 +116,27 @@ func createNewGoravelApp(arg2 string) error {
 
 	// Copy handlers.go file
 	toFile = gor.RootPath + "/handlers" + "/" + "handlers.go"
-	err = handleCopyDataToFile("templates/handlers/handlers.go.txt", toFile, replaceDataMap{
+	err = handleCopyDataToFile("templates/handlers/handlers.go.txt", toFile, ReplaceDataMap{
 		"${APP_URL}": appURL,
 	})
 	if err != nil {
 		return err
 	}
 
+	// copy the base layout file
+	err = gor.CreateDirIfNotExists(gor.RootPath + "/views/layouts") // Create the layouts folder
+	if err != nil {
+		return err
+	}
+	toFile = gor.RootPath + "/views" + "/layouts/" + "base.jet"
+	err = handleCopyDataToFile("templates/views/layouts/base.jet", toFile, ReplaceDataMap{})
+	if err != nil {
+		return err
+	}
+
 	// Copy go.mod file
 	toFile = gor.RootPath + "/" + "go.mod"
-	err = handleCopyDataToFile("templates/new/go.mod.txt", toFile, replaceDataMap{
+	err = handleCopyDataToFile("templates/new/go.mod.txt", toFile, ReplaceDataMap{
 		"${APP_URL}": appURL,
 	})
 	if err != nil {
@@ -133,7 +145,7 @@ func createNewGoravelApp(arg2 string) error {
 
 	// Copy .gitignore file
 	toFile = gor.RootPath + "/" + ".gitignore"
-	err = handleCopyDataToFile("templates/new/gitignore.txt", toFile, replaceDataMap{})
+	err = handleCopyDataToFile("templates/new/gitignore.txt", toFile, ReplaceDataMap{})
 	if err != nil {
 		return err
 	}
@@ -155,11 +167,11 @@ func createNewGoravelApp(arg2 string) error {
 	return nil
 }
 
-type replaceDataMap map[string]string
+type ReplaceDataMap map[string]string
 
 // handleCopyDataToFile copies data from a file in the templateFS, replaces the placeholders
 // and writes it to a new file in the rootPath
-func handleCopyDataToFile(from string, to string, replace replaceDataMap) error {
+func handleCopyDataToFile(from string, to string, replace ReplaceDataMap) error {
 
 	if fileExists(to) {
 		return errors.New(to + " already exists!")

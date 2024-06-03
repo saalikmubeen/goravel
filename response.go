@@ -17,7 +17,7 @@ import (
 )
 
 // Define an envelope type.
-type Envelope map[string]interface{}
+type Response map[string]interface{}
 
 // readIDParam reads interpolated "id" from request URL and returns it and nil. If there is an error
 // it returns and 0 and an error.
@@ -35,7 +35,7 @@ func (g *Goravel) ReadIDParam(r *http.Request) (int64, error) {
 
 // writeJSON marshals data structure to encoded JSON response. It returns an error if there are
 // any issues, else error is nil.
-func (g *Goravel) WriteJSON(w http.ResponseWriter, status int, data Envelope,
+func (g *Goravel) WriteJSON(w http.ResponseWriter, status int, data Response,
 	headers ...http.Header) error {
 	// Use the json.MarshalIndent() function so that whitespace is added to the encoded JSON. Use
 	// no line prefix and tab indents for each element.

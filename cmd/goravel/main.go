@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"strconv"
 
@@ -97,9 +98,13 @@ func initGoravel(arg1 string) error {
 	gor.InfoLog = infoLog
 	gor.ErrorLog = errorLog
 
+	gor.AppName = os.Getenv("APP_NAME")
+	gor.GoAppURL = os.Getenv("GO_APP_URL")
 	gor.Debug, _ = strconv.ParseBool(os.Getenv("DEBUG"))
 
 	var databaseType = ""
+
+	fmt.Println(gor.GoAppURL)
 
 	if os.Getenv("DATABASE_TYPE") == "postgres" || os.Getenv("DATABASE_TYPE") == "postgresql" {
 		databaseType = "postgres"

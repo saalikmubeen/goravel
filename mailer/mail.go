@@ -69,9 +69,13 @@ func (m *Mail) ListenForMail() {
 // Send sends an email message using correct method. If API values are set,
 // it will send using the appropriate api; otherwise, it sends via smtp
 func (m *Mail) Send(msg Message) error {
-	if len(m.API) > 0 && len(m.APIKey) > 0 && len(m.APIUrl) > 0 && m.API != "smtp" {
+	fmt.Printf("%+v\n", m)
+	if len(m.API) > 0 && len(m.APIKey) > 0 && m.API != "smtp" {
+		fmt.Println("Sending mail via API")
 		return m.ChooseAPI(msg)
 	}
+
+	fmt.Println("Sending mail via SMTP")
 	return m.SendUsingSMTP(msg)
 }
 
