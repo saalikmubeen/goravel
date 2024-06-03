@@ -25,7 +25,7 @@ import (
 
 const (
 	// Version of Goravel
-	Version = "2.0.0"
+	Version = "1.4.0"
 	// http://patorjk.com/software/taag/#p=display&f=Ogre&t=Goravel
 	Banner = `
 	___                          _
