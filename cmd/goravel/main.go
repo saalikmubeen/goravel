@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"strconv"
 
@@ -10,8 +9,6 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/saalikmubeen/goravel"
 )
-
-const version = "1.2.0"
 
 var gor *goravel.Goravel
 
@@ -33,7 +30,7 @@ func main() {
 		showHelp()
 
 	case "version":
-		color.Green("Version: %s", gor.Version)
+		color.Yellow(goravel.Banner, goravel.Version)
 
 	case "new":
 		if arg2 == "" {
@@ -80,7 +77,7 @@ func initGoravel(arg1 string) error {
 	}
 
 	gor.RootPath = rootPath
-	gor.Version = version
+	gor.Version = goravel.Version
 
 	if arg1 == "help" || arg1 == "version" || arg1 == "new" {
 		return nil
@@ -103,8 +100,6 @@ func initGoravel(arg1 string) error {
 	gor.Debug, _ = strconv.ParseBool(os.Getenv("DEBUG"))
 
 	var databaseType = ""
-
-	fmt.Println(gor.GoAppURL)
 
 	if os.Getenv("DATABASE_TYPE") == "postgres" || os.Getenv("DATABASE_TYPE") == "postgresql" {
 		databaseType = "postgres"

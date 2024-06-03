@@ -25,10 +25,13 @@ type Models struct {
 func New(database goravel.Database) *Models {
 	db = database.Pool
 
-	if database.DatabaseType == "mysql" || database.DatabaseType == "mariadb" {
+	switch database.DatabaseType {
+	case "mysql", "mariadb":
 		upper, _ = mysql.New(database.Pool)
-	} else {
+	case "postgres", "postgresql", "pgx":
 		upper, _ = postgresql.New(database.Pool)
+	default:
+		// do nothing
 	}
 
 	return &Models{

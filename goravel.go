@@ -11,9 +11,12 @@ import (
 
 	"github.com/CloudyKit/jet/v6"
 	"github.com/alexedwards/scs/v2"
+	"github.com/dgraph-io/badger/v3"
+	"github.com/fatih/color"
 	"github.com/go-chi/chi/v5"
 	"github.com/gomodule/redigo/redis"
 	"github.com/joho/godotenv"
+	"github.com/robfig/cron/v3"
 	"github.com/saalikmubeen/goravel/cache"
 	"github.com/saalikmubeen/goravel/mailer"
 	"github.com/saalikmubeen/goravel/render"
@@ -21,11 +24,26 @@ import (
 )
 
 const (
-	version = "1.2.0"
+	// Version of Goravel
+	Version = "1.0.0"
+	// http://patorjk.com/software/taag/#p=display&f=Ogre&t=Goravel
+	Banner = `
+	___                          _
+  / _ \___  _ __ __ ___   _____| |
+ / /_\/ _ \| '__/ _ \ \ / / _ \ |
+/ /_\\ (_) | | | (_| |\ V /  __/ |
+\____/\___/|_|  \__,_| \_/ \___|_| %s
+PHP's Laravel like web framework supercharged with Go
+____________________________________O/_______
+                                    O\
+`
 )
 
 var myRedisCache *cache.RedisCache
 var redisPool *redis.Pool
+
+var myBadgerCache *cache.BadgerCache
+var badgerConn *badger.DB
 
 type Goravel struct {
 	AppName       string
@@ -44,6 +62,7 @@ type Goravel struct {
 	Cache         cache.Cache
 	EncryptionKey string
 	Mail          mailer.Mail
+	Scheduler     *cron.Cron
 
 	// not exported, used internally
 	// contains mostly loaded environment variables.
@@ -127,14 +146,6 @@ func (g *Goravel) BuildDSN() string {
 	return dsn
 }
 
-func (g *Goravel) createRedisCache() *cache.RedisCache {
-	cacheClient := cache.RedisCache{
-		Conn:   g.createRedisPool(),
-		Prefix: g.config.redis.prefix,
-	}
-	return &cacheClient
-}
-
 func (g *Goravel) createRedisPool() *redis.Pool {
 	return &redis.Pool{
 		MaxIdle:     50,
@@ -151,6 +162,29 @@ func (g *Goravel) createRedisPool() *redis.Pool {
 			return err
 		},
 	}
+}
+
+func (g *Goravel) createRedisCache() *cache.RedisCache {
+	cacheClient := cache.RedisCache{
+		Conn:   g.createRedisPool(),
+		Prefix: g.config.redis.prefix,
+	}
+	return &cacheClient
+}
+
+func (g *Goravel) createBadgerConn() *badger.DB {
+	db, err := badger.Open(badger.DefaultOptions(g.RootPath + "/tmp/badger"))
+	if err != nil {
+		return nil
+	}
+	return db
+}
+
+func (g *Goravel) createBadgerCache() *cache.BadgerCache {
+	cacheClient := cache.BadgerCache{
+		Conn: g.createBadgerConn(),
+	}
+	return &cacheClient
 }
 
 func (g *Goravel) createMailer() mailer.Mail {
@@ -208,7 +242,7 @@ func (g *Goravel) New(rootPath string) error {
 	g.AppName = os.Getenv("APP_NAME")
 	g.GoAppURL = os.Getenv("GO_APP_URL")
 	g.Debug, _ = strconv.ParseBool(os.Getenv("DEBUG"))
-	g.Version = version
+	g.Version = Version
 	g.RootPath = rootPath
 	g.EncryptionKey = os.Getenv("KEY")
 
@@ -268,11 +302,30 @@ func (g *Goravel) New(rootPath string) error {
 		}
 	}
 
+	// ** create the scheduler
+	scheduler := cron.New()
+	g.Scheduler = scheduler
+
 	// ** Initilize the cache
 	if os.Getenv("CACHE") == "redis" || os.Getenv("SESSION_TYPE") == "redis" {
 		myRedisCache = g.createRedisCache()
 		redisPool = myRedisCache.Conn
 		g.Cache = myRedisCache
+	}
+
+	if os.Getenv("CACHE") == "badger" {
+		myBadgerCache = g.createBadgerCache()
+		g.Cache = myBadgerCache
+		badgerConn = myBadgerCache.Conn
+
+		// Run the garbage collector on the badger database
+		// every 24 hours
+		_, err = g.Scheduler.AddFunc("@daily", func() {
+			_ = myBadgerCache.Conn.RunValueLogGC(0.7)
+		})
+		if err != nil {
+			return err
+		}
 	}
 
 	// ** Create and initialize the session
@@ -339,9 +392,20 @@ func (g *Goravel) ListenAndServe() {
 		WriteTimeout: time.Second * 600,
 	}
 
-	defer g.DB.Pool.Close() // close the database connection when the server stops
+	if g.DB.Pool != nil {
+		defer g.DB.Pool.Close() // close the database connection when the server stops
+	}
 
-	g.InfoLog.Printf("Starting server on port %s", port)
+	if redisPool != nil {
+		defer redisPool.Close() // close the redis connection when the server stops
+	}
+
+	if badgerConn != nil {
+		defer badgerConn.Close()
+	}
+
+	color.Yellow(Banner, Version)
+	color.Green("Starting server on port %s", port)
 	err := srv.ListenAndServe()
 	g.ErrorLog.Fatal(err)
 }

@@ -134,6 +134,13 @@ func createNewGoravelApp(arg2 string) error {
 		return err
 	}
 
+	// copy the home view file
+	toFile = gor.RootPath + "/views" + "/" + "home.jet"
+	err = handleCopyDataToFile("templates/views/home.jet", toFile, ReplaceDataMap{})
+	if err != nil {
+		return err
+	}
+
 	// Copy go.mod file
 	toFile = gor.RootPath + "/" + "go.mod"
 	err = handleCopyDataToFile("templates/new/go.mod.txt", toFile, ReplaceDataMap{

@@ -3,7 +3,7 @@ module ${APP_URL}
 go 1.22.3
 
 require (
-  github.com/saalikmubeen/goravel v1.2.0
+  github.com/saalikmubeen/goravel v1.0.0
 	github.com/CloudyKit/jet/v6 v6.2.0
 	github.com/go-chi/chi/v5 v5.0.12
 	github.com/upper/db/v4 v4.7.0
