@@ -2,7 +2,10 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"os"
+	"os/exec"
+	"path/filepath"
 	"strconv"
 
 	"github.com/fatih/color"
@@ -63,6 +66,33 @@ func main() {
 				exitGracefully(err)
 			}
 		}
+
+	case "serve":
+		goFiles, err := filepath.Glob(filepath.Join(gor.RootPath, "*.go"))
+		if err != nil {
+			fmt.Println("Error finding Go files:", err)
+			exitGracefully(err)
+			return
+		}
+
+		if len(goFiles) == 0 {
+			fmt.Println("No Go files found in the specified directory")
+			exitGracefully(fmt.Errorf("no Go files found"))
+			return
+		}
+
+		cmd := exec.Command("go", append([]string{"run"}, goFiles...)...)
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+
+		err = cmd.Start()
+
+		if err != nil {
+			exitGracefully(err)
+		}
+
+	default:
+		showHelp()
 	}
 
 }

@@ -50,7 +50,7 @@ func createNewGoravelApp(arg2 string) error {
 
 	paths := goravel.InitPaths{
 		RootPath:    gor.RootPath,
-		FolderNames: []string{"handlers", "migrations", "views", "mail", "models", "public", "tmp", "logs", "middleware", "screenshots"},
+		FolderNames: []string{"handlers", "migrations", "views", "mail", "models", "public", "tmp", "logs", "middleware"},
 	}
 
 	// ** create the necessary folders

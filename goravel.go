@@ -212,7 +212,7 @@ func (g *Goravel) New(rootPath string) error {
 
 	paths := InitPaths{
 		RootPath:    rootPath,
-		FolderNames: []string{"handlers", "migrations", "views", "mail", "models", "public", "tmp", "logs", "middleware", "screenshots"},
+		FolderNames: []string{"handlers", "migrations", "views", "mail", "models", "public", "tmp", "logs", "middleware"},
 	}
 
 	// ** create the necessary folders

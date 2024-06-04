@@ -69,7 +69,7 @@
 <defs>
 </defs>
 </svg>
-           <hr style="margin-top: 80px">
+           <div style="margin-top: 80px"></div>
            <em style="display:flex; align-items:center"> <span style="color: var(--bs-info); display:inline-block; margin-right: 5px" class="h1"> Go</span> build something awesome</em>
             <em class="text-muted"> Happy coding :> </em>
 
@@ -77,6 +77,8 @@
         </div>
     </div>
 
+
+     <div style="margin-bottom: 80px"></div>
     <hr>
 
 
