@@ -107,8 +107,8 @@ func handleAuth() error {
 	color.Green("✓ Successfully generated user and token models.")
 	color.Green("✓ Successfully created authentication middlewares.")
 	color.Yellow("")
-	color.Cyan("Note: Ensure that the user and token models are registered in models/models.go.")
-	color.Cyan(`      - Register you custom models in modes/modesl.go for initialization and usage`)
+	color.Cyan("Note: Ensure that the models are registered in models/models.go.")
+	color.Cyan(`      - Register the User, Token, and RememberMeToken models in the models/models.go file.`)
 	color.Cyan(`      - Also don't forget to register the generated auth middlewares in the routes.go file.`)
 
 	return nil

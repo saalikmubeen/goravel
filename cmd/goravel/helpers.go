@@ -12,7 +12,7 @@ func showHelp() {
 
 	help                  - show the help commands
 	version               - print application version
-	serve 							  - starts the server
+	serve                 - starts the server
 	new <project-name>    - creates a new goravel application
 	make migration <name> - creates two new migration files one up and one down in the migrations folder
 	migrate               - runs all up migrations that have not been run previously
@@ -25,7 +25,7 @@ func showHelp() {
 	make auth             - creates and runs migrations for authentication tables, and creates models and middleware
 	make session          - creates a table in the database as a session store
 	make handler <name>   - creates a stub handler in the handlers directory
-	make model <name>     - creates a new model in the data directory
+	make model <name>     - creates a new model in the models  directory. Register all of your custom models in modes/models.go for initialization and usage
 	`)
 }
 
