@@ -119,7 +119,10 @@ func (h *Handlers) Logout(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handlers) UserSignup(w http.ResponseWriter, r *http.Request) {
-	err := h.App.Render.Page(w, r, "signup", nil, nil)
+  var user = models.User{}
+	vars := make(jet.VarMap)
+	vars.Set("user", user)
+	err := h.App.Render.Page(w, r, "signup", vars, nil)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 	}

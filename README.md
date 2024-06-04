@@ -4,6 +4,8 @@
 
 
 # Goravel
+[![Release](https://img.shields.io/github/release/saalikmubeen/goravel.svg?style=flat-square)](https://github.com/saalikmubeen/goravel/releases)
+
 
 PHP's Laravel like web framework supercharged with Go.
 
@@ -85,10 +87,6 @@ go mod tidy
 
 6. Run the server:
 
-```bash
-goravel serve
-```
-`OR`
 
 ```bash
 go run ./*.go
@@ -147,3 +145,8 @@ You don't have to do anything. Just run this command and you are good to go.
 - `goravel make session`: Generates all the necessary files for session management if you want to use database for session storage. This creates and runs migrations for session tables, again saving you from the hassle of writing boring migration files.
 
 
+
+
+## License
+
+Goravel is open-source software licensed under the [MIT license](https://opensource.org/licenses/MIT).

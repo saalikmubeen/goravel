@@ -2,12 +2,14 @@ package handlers
 
 import (
     "net/http"
+
+    "github.com/saalikmubeen/goravel"
 )
 
 // $HANDLERNAME$ is a generated handler function
 func (h *Handlers) $HANDLERNAME$(w http.ResponseWriter, r *http.Request) {
 
-  h.App.WriteJSON(w, http.StatusOK, map[string]interface{}{
+  h.App.WriteJSON(w, http.StatusOK, goravel.Response{
 		"data": "Happy coding!",
 	})
 

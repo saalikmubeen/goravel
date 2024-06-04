@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-//go:embed templates
+//go:embed "all:templates"
 var templateFS embed.FS
 
 func copyFilefromTemplate(from string, to string) error {
