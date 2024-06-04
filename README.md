@@ -55,7 +55,7 @@ PHP's Laravel like web framework supercharged with Go.
 1. Install Goravel CLI tool:
 
 ```bash
-go install github.com/saalikmubeen/goravel/cmd/goravel@latest
+go install github.com/saalikmubeen/goravel/cmd/goravel@v1.5.1
 ```
 
 2. Make sure to add `$GOPATH/bin` to your `$PATH` so that you can run the Goravel CLI tool from anywhere. If you don't have it, you can add it to your `~/.bashrc` or `~/.bash_profile` or `~/.zshrc` file:
