@@ -1,0 +1,20 @@
+package main
+
+import (
+	"net/http"
+
+	"github.com/go-chi/chi/v5"
+)
+
+func (app *application) ApiRoutes() http.Handler {
+	r := chi.NewRouter()
+
+	r.Route("/api", func(mux chi.Router) {
+		// ** add your API routes here
+
+		// User routes
+		r.Get("/hello", app.Handlers.HelloWorld)
+	})
+
+	return r
+}

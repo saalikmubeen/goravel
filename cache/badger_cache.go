@@ -94,7 +94,10 @@ func (b *BadgerCache) Prune() error {
 	return b.emptyByMatch("")
 }
 
+// emptyByMatch removes all keys in the cache that match a pattern
 func (b *BadgerCache) emptyByMatch(prefix string) error {
+
+	// deleteKeys is a helper function that deletes the keys from the cache
 	deleteKeys := func(keysForDelete [][]byte) error {
 		if err := b.Conn.Update(func(txn *badger.Txn) error {
 			for _, key := range keysForDelete {
@@ -109,6 +112,8 @@ func (b *BadgerCache) emptyByMatch(prefix string) error {
 		return nil
 	}
 
+	// how much of the cache we should handle at any given time
+	// collectSize is the number of keys to collect before deleting them
 	collectSize := 100000
 
 	err := b.Conn.View(func(txn *badger.Txn) error {
@@ -121,6 +126,8 @@ func (b *BadgerCache) emptyByMatch(prefix string) error {
 		keysForDelete := make([][]byte, 0, collectSize)
 		keysCollected := 0
 
+		// search the entire badger cache for the keys that match the prefix
+		// that we want to delete
 		for it.Seek([]byte(prefix)); it.ValidForPrefix([]byte(prefix)); it.Next() {
 			key := it.Item().KeyCopy(nil)
 			keysForDelete = append(keysForDelete, key)

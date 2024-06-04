@@ -13,6 +13,9 @@ func (app *application) routes() *chi.Mux {
 	// ** Add your routes here
 	app.App.Routes.Get("/", app.Handlers.Home)
 
+  // ** API routes
+	app.App.Routes.Mount("/api", app.ApiRoutes())
+
 	// ** Static file server
 	fileServer := http.FileServer(http.Dir("./public"))
 	app.App.Routes.Handle("/public/*", http.StripPrefix("/public", fileServer))

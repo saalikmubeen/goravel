@@ -87,6 +87,13 @@ func createNewGoravelApp(arg2 string) error {
 		return err
 	}
 
+	// Copy routes_api.go file
+	toFile = gor.RootPath + "/" + "routes_api.go"
+	err = handleCopyDataToFile("templates/new/routes_api.go.txt", toFile, ReplaceDataMap{})
+	if err != nil {
+		return err
+	}
+
 	// Copy init-goravel.go file
 	toFile = gor.RootPath + "/" + "init-goravel.go"
 	err = handleCopyDataToFile("templates/new/init-goravel.go.txt", toFile, ReplaceDataMap{
