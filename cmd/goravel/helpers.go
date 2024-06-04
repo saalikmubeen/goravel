@@ -12,14 +12,20 @@ func showHelp() {
 
 	help                  - show the help commands
 	version               - print application version
-	migrate               - runs all up migrations that have not been run previously
-	migrate down          - reverses the most recent migration
-	migrate reset         - runs all down migrations in reverse order, and then all up migrations
+	serve 							  - starts the server
+	new <project-name>    - creates a new goravel application
 	make migration <name> - creates two new migration files one up and one down in the migrations folder
+	migrate               - runs all up migrations that have not been run previously
+	migrate up            - same as migrate
+	migrate down          - reverses the most recent migration
+	migrate down all      - reverses all migrations
+	migrate to <number>   - migrates to a specific migration number (number: positive for up, negative for down migrations)
+	migrate fix           - Fix the migrations table if it's corrupted by forcing the version to the last migration (-1)
+	migrate reset         - runs all down migrations in reverse order, and then all up migrations
 	make auth             - creates and runs migrations for authentication tables, and creates models and middleware
+	make session          - creates a table in the database as a session store
 	make handler <name>   - creates a stub handler in the handlers directory
 	make model <name>     - creates a new model in the data directory
-	make session          - creates a table in the database as a session store
 	`)
 }
 

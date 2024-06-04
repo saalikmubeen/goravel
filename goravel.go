@@ -3,7 +3,6 @@ package goravel
 import (
 	"fmt"
 	"log"
-	"net/http"
 	"os"
 	"strconv"
 	"strings"
@@ -12,7 +11,6 @@ import (
 	"github.com/CloudyKit/jet/v6"
 	"github.com/alexedwards/scs/v2"
 	"github.com/dgraph-io/badger/v3"
-	"github.com/fatih/color"
 	"github.com/go-chi/chi/v5"
 	"github.com/gomodule/redigo/redis"
 	"github.com/joho/godotenv"
@@ -25,7 +23,7 @@ import (
 
 const (
 	// Version of Goravel
-	Version = "1.4.2"
+	Version = "1.5.0"
 	// http://patorjk.com/software/taag/#p=display&f=Ogre&t=Goravel
 	Banner = `
 	___                          _
@@ -378,34 +376,4 @@ func (g *Goravel) New(rootPath string) error {
 
 	return nil
 
-}
-
-// ListenAndServe starts the web server
-func (g *Goravel) ListenAndServe() {
-	port := os.Getenv("PORT")
-	srv := &http.Server{
-		Addr:         ":" + port,
-		Handler:      g.Routes,
-		ErrorLog:     g.ErrorLog,
-		IdleTimeout:  time.Second * 30,
-		ReadTimeout:  time.Second * 30,
-		WriteTimeout: time.Second * 600,
-	}
-
-	if g.DB.Pool != nil {
-		defer g.DB.Pool.Close() // close the database connection when the server stops
-	}
-
-	if redisPool != nil {
-		defer redisPool.Close() // close the redis connection when the server stops
-	}
-
-	if badgerConn != nil {
-		defer badgerConn.Close()
-	}
-
-	color.Yellow(Banner, Version)
-	color.Green("Starting server on port %s", port)
-	err := srv.ListenAndServe()
-	g.ErrorLog.Fatal(err)
 }
